@@ -28,7 +28,7 @@ const Register = () => {
       setLoading(true);
 
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/auth/register`,
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

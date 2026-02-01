@@ -76,7 +76,7 @@ const Profile = () => {
   const avatarSrc = avatar
     ? avatar.startsWith("http")
       ? avatar
-      : `${process.env.REACT_APP_API_URL}${avatar}`
+      : `${import.meta.env.VITE_API_URL}${avatar}`
     : "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png";
 
   return (

@@ -22,7 +22,7 @@ const ChatContainer = ({ currentUserId, friend }) => {
         setLoading(true);
 
         const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/messages/${friend._id}`,
+          `${import.meta.env.VITE_API_URL}/api/messages/${friend._id}`,
           {
             headers: { "x-user-id": currentUserId },
             credentials: "include"

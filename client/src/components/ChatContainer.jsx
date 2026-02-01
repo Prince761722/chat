@@ -8,7 +8,9 @@ const ChatContainer = ({ currentUserId, friend }) => {
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
 
-  // Load previous messages when friend changes
+  /* =========================
+     LOAD PREVIOUS MESSAGES
+  ========================= */
   useEffect(() => {
     const fetchMessages = async () => {
       if (!friend?._id || !currentUserId) {
@@ -18,10 +20,12 @@ const ChatContainer = ({ currentUserId, friend }) => {
 
       try {
         setLoading(true);
+
         const res = await fetch(
-          `http://localhost:5000/api/messages/${friend._id}`,
+          `${process.env.REACT_APP_API_URL}/api/messages/${friend._id}`,
           {
             headers: { "x-user-id": currentUserId },
+            credentials: "include"
           }
         );
 
@@ -37,19 +41,20 @@ const ChatContainer = ({ currentUserId, friend }) => {
     fetchMessages();
   }, [friend?._id, currentUserId]);
 
-  // Real-time socket listener (ONLY for receiving messages)
+  /* =========================
+     SOCKET LISTENER (RECEIVE)
+  ========================= */
   useEffect(() => {
     if (!socket || !currentUserId || !friend?._id) return;
 
     const handleReceive = (msg) => {
-      // Ensure it's for the current chat
       if (
         (msg.from === friend._id && msg.to === currentUserId) ||
         (msg.from === currentUserId && msg.to === friend._id)
       ) {
         setMessages((prev) => [
           ...prev,
-          { ...msg, fromMe: msg.from === currentUserId },
+          { ...msg, fromMe: msg.from === currentUserId }
         ]);
       }
     };
@@ -61,7 +66,9 @@ const ChatContainer = ({ currentUserId, friend }) => {
     };
   }, [friend?._id, currentUserId]);
 
-  // Send message
+  /* =========================
+     SEND MESSAGE
+  ========================= */
   const handleSend = (e) => {
     e.preventDefault();
     if (!text.trim() || !friend?._id || !currentUserId) return;
@@ -70,22 +77,21 @@ const ChatContainer = ({ currentUserId, friend }) => {
     setText("");
     setShowEmoji(false);
 
-    // Optimistic UI update → NO DUPLICATE ANYMORE
+    // Optimistic UI update
     const tempMessage = {
       _id: Date.now().toString(),
       text: messageText,
       from: currentUserId,
       to: friend._id,
-      fromMe: true,
+      fromMe: true
     };
 
     setMessages((prev) => [...prev, tempMessage]);
 
-    // Emit to backend
     socket.emit("send-message", {
       from: currentUserId,
       to: friend._id,
-      text: messageText,
+      text: messageText
     });
   };
 
@@ -144,7 +150,7 @@ const ChatContainer = ({ currentUserId, friend }) => {
         ))}
       </div>
 
-      {/* Emoji picker */}
+      {/* Emoji Picker */}
       {showEmoji && (
         <div className="absolute bottom-16 left-4 z-50">
           <EmojiPicker
@@ -156,13 +162,12 @@ const ChatContainer = ({ currentUserId, friend }) => {
         </div>
       )}
 
-      {/* Input Bar */}
+      {/* Input */}
       <form
         onSubmit={handleSend}
         className="border-t border-white/10 px-4 py-3 bg-slate-950/70"
       >
         <div className="flex items-center gap-2">
-          {/* Emoji Toggle */}
           <button
             type="button"
             onClick={() => setShowEmoji((prev) => !prev)}

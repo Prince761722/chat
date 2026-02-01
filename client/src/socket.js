@@ -1,7 +1,8 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:5000", {
-  autoConnect: false
+const socket = io(process.env.REACT_APP_API_URL, {
+  transports: ["websocket"],
+  withCredentials: true
 });
 
 export const connectSocket = (userId) => {

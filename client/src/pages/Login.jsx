@@ -20,17 +20,21 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username.trim(),
-          password
-        })
-      });
+
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            username: username.trim(),
+            password
+          })
+        }
+      );
 
       const data = await res.json();
-      console.log("Login response:", data);
 
       if (!res.ok) {
         setErrorMsg(data.message || "Login failed");

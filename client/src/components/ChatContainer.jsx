@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
-import EmojiPicker from "emoji-picker-react/dist/index.js";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatContainer = ({ currentUserId, friend }) => {
   const [messages, setMessages] = useState([]);

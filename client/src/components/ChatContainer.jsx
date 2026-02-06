@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { socket } from "../socket";
+import { socket, connectSocket } from "../socket";
 import EmojiPicker from "emoji-picker-react";
 
 const ChatContainer = ({ currentUserId, friend }) => {
@@ -7,6 +7,14 @@ const ChatContainer = ({ currentUserId, friend }) => {
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
+
+  /* =========================
+     CONNECT SOCKET
+  ========================= */
+  useEffect(() => {
+    if (!currentUserId) return;
+    connectSocket(currentUserId);
+  }, [currentUserId]);
 
   /* =========================
      LOAD PREVIOUS MESSAGES
@@ -30,7 +38,12 @@ const ChatContainer = ({ currentUserId, friend }) => {
         );
 
         const data = await res.json();
-        setMessages(data);
+        setMessages(
+          data.map((msg) => ({
+            ...msg,
+            fromMe: msg.from === currentUserId
+          }))
+        );
       } catch (err) {
         console.error("Failed to load messages:", err);
       } finally {
@@ -45,7 +58,7 @@ const ChatContainer = ({ currentUserId, friend }) => {
      SOCKET LISTENER (RECEIVE)
   ========================= */
   useEffect(() => {
-    if (!socket || !currentUserId || !friend?._id) return;
+    if (!currentUserId || !friend?._id) return;
 
     const handleReceive = (msg) => {
       if (
@@ -95,6 +108,9 @@ const ChatContainer = ({ currentUserId, friend }) => {
     });
   };
 
+  /* =========================
+     EMPTY STATE
+  ========================= */
   if (!friend) {
     return (
       <div className="h-full flex items-center justify-center text-sm text-slate-400">
